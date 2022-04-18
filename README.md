@@ -6,6 +6,8 @@ An enchanced useState hook which keeps track of the states history, allowing you
 
 **useTimeline** is a simple hook based on the **useState** hook which abstracts operations of undo and redo.
 
+A full example is avaiable on [here](https://codesandbox.io/s/blissful-framework-xqwyli?file=/src/App.tsx:300-401).
+
 ## Quick Start
 
 ```tsx
