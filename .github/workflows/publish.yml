@@ -15,6 +15,8 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: Install dependencies and build 🔧
         run: yarn install
+      - name: Version
+        run: yarn version --new-version "${GITHUB_REF:11}" --no-git-tag-version
       - name: Publish package on NPM 📦
         run: yarn publish --access public
         env:
