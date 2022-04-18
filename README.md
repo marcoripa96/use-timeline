@@ -8,6 +8,20 @@ An enchanced useState hook which keeps track of the states history, allowing you
 
 A full example is avaiable on [here](https://stackblitz.com/edit/react-ts-qi1zgm?file=ExampleUseTimeline.tsx).
 
+## Install
+
+With npm:
+
+```
+npm install @mr96/useTimeline
+```
+
+With yarn:
+
+```
+yarn add @mr96/useTimeline
+```
+
 ## Quick Start
 
 ```tsx
