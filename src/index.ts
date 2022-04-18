@@ -21,6 +21,8 @@ export type TimelineInstance<T> = {
   pastTimeline: TimeSlice<T>[],
   // timeline containing future timeSlices
   futureTimeline: TimeSlice<T>[],
+  // clear the whole timeline keeping the current state
+  clearTimeline: () => void;
   // true if can undo
   canUndo: boolean,
   // trye if can redo
@@ -73,6 +75,9 @@ function _getFuture<T>(state: UndoableState<T>) {
     .map((timeSlice, index) => ({ timeSlice, index: state.index + 1 + index }));
 }
 
+/**
+ * Insert timeSlice, erases future timeSlices, move current timeSlice to past
+ */
 function _insert<T>(
   state: UndoableState<T>,
   timeSlice: T,
@@ -116,6 +121,11 @@ function _jumpTo<T>(state: UndoableState<T>, to: number) {
 function _getCurrentTimeSlice<T>(state: UndoableState<T>) {
   const { timeline, index } = state;
   return timeline[index];
+}
+
+function _clearTimeline<T>(state: UndoableState<T>) {
+  const currentTimeSlice = _getCurrentTimeSlice(state);
+  return _newState([currentTimeSlice], 0);
 }
 
 function _initState<T>(initialValue: SetStateArg<T>): UndoableState<T> {
@@ -172,6 +182,12 @@ export function useTimeline<T>(initialValue?: T, options?: Options): TimelineIns
     });
   }, []);
 
+  const clearTimeline = useCallback(() => {
+    _setState((s) => {
+      return _clearTimeline(s)
+    })
+  }, []);
+
   const pastTimeline = useMemo(() => _getPast(_state), [_state]);
   const futureTimeline = useMemo(() => _getFuture(_state), [_state]);
 
@@ -186,6 +202,7 @@ export function useTimeline<T>(initialValue?: T, options?: Options): TimelineIns
     jumpTo,
     pastTimeline,
     futureTimeline,
+    clearTimeline,
     canUndo: _canUndoTo(_state, _state.index - 1),
     canRedo: _canRedoTo(_state, _state.index + 1)
   };
