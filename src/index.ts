@@ -1,12 +1,48 @@
 import { useCallback, useMemo, useState } from "react";
 import { isFunction } from "./utils";
 
-type SetStateArg<T> = T | ((state: T) => T);
+/**
+ * Instance returned from useTimeline.
+ */
+type TimelineInstance<T> = {
+  // current state
+  state: T;
+  // set new state
+  setState: (arg: SetStateArg<T>) => void,
+  // internal state of the timeline
+  internal: UndoableState<T>,
+  // go to previous state
+  undo: () => void,
+  // go to next state
+  redo: () => void,
+  // jump to any timeSlice
+  jumpTo: (index: number) => void,
+  // timeline containing past timeSlices
+  pastTimeline: TimeSlice<T>[],
+  // timeline containing future timeSlices
+  futureTimeline: TimeSlice<T>[],
+  // true if can undo
+  canUndo: boolean,
+  // trye if can redo
+  canRedo: boolean
+};
+
+type Options = {
+  maxTimelineSize?: number
+}
 
 type UndoableState<T> = {
   timeline: T[];
   index: number;
 };
+
+type TimeSlice<T> = {
+  timeSlice: T,
+  index: number
+}
+
+type SetStateArg<T> = undefined | T | ((state: T) => T);
+
 
 function _newState<T>(timeline: T[], index: number) {
   return {
@@ -91,17 +127,26 @@ function _initState<T>(initialValue: SetStateArg<T>): UndoableState<T> {
   return _newState([_initialTimeSlice], 0);
 }
 
-export default function useTimeline<T>(initialValue: T) {
+const defaultOptions: Options = {
+  maxTimelineSize: 20
+}
+
+export default function useTimeline<T>(initialValue?: T, options?: Options): TimelineInstance<T> {
   const [_state, _setState] = useState(() => _initState(initialValue));
+
+  const { maxTimelineSize } = {
+    ...defaultOptions,
+    ...options
+  } as Required<Options>;
 
   const setState = useCallback((arg: SetStateArg<T>) => {
     _setState((s) => {
       const timeSlice = _getCurrentTimeSlice(s);
 
       if (isFunction(arg)) {
-        return _insert(s, (arg as Function)(timeSlice));
+        return _insert(s, (arg as Function)(timeSlice), maxTimelineSize);
       }
-      return _insert(s, arg);
+      return _insert(s, arg, maxTimelineSize);
     });
   }, []);
 
@@ -131,22 +176,15 @@ export default function useTimeline<T>(initialValue: T) {
   const futureTimeline = useMemo(() => _getFuture(_state), [_state]);
 
   return {
-    // current timeSlice
     state: _getCurrentTimeSlice(_state),
     setState,
-    // internal state of the timeline
     internal: {
       ..._state
     },
-    // go to previous state
     undo,
-    // go to next state
     redo,
-    // jump to any timeSlice
     jumpTo,
-    // timeline containing past timeSlices
     pastTimeline,
-    // timeline containing future timeSlices
     futureTimeline,
     canUndo: _canUndoTo(_state, _state.index - 1),
     canRedo: _canRedoTo(_state, _state.index + 1)
