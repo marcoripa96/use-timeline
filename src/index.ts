@@ -4,7 +4,7 @@ import { isFunction } from "./utils";
 /**
  * Instance returned from useTimeline.
  */
-type TimelineInstance<T> = {
+export type TimelineInstance<T> = {
   // current state
   state: T;
   // set new state
@@ -27,21 +27,21 @@ type TimelineInstance<T> = {
   canRedo: boolean
 };
 
-type Options = {
+export type Options = {
   maxTimelineSize?: number
 }
 
-type UndoableState<T> = {
+export type UndoableState<T> = {
   timeline: T[];
   index: number;
 };
 
-type TimeSlice<T> = {
+export type TimeSlice<T> = {
   timeSlice: T,
   index: number
 }
 
-type SetStateArg<T> = undefined | T | ((state: T) => T);
+export type SetStateArg<T> = undefined | T | ((state: T) => T);
 
 
 function _newState<T>(timeline: T[], index: number) {
@@ -131,7 +131,7 @@ const defaultOptions: Options = {
   maxTimelineSize: 20
 }
 
-export default function useTimeline<T>(initialValue?: T, options?: Options): TimelineInstance<T> {
+export function useTimeline<T>(initialValue?: T, options?: Options): TimelineInstance<T> {
   const [_state, _setState] = useState(() => _initState(initialValue));
 
   const { maxTimelineSize } = {
