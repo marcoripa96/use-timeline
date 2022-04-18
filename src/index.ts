@@ -91,7 +91,7 @@ function _initState<T>(initialValue: SetStateArg<T>): UndoableState<T> {
   return _newState([_initialTimeSlice], 0);
 }
 
-export function useTimeline<T>(initialValue: T) {
+export default function useTimeline<T>(initialValue: T) {
   const [_state, _setState] = useState(() => _initState(initialValue));
 
   const setState = useCallback((arg: SetStateArg<T>) => {
