@@ -13,13 +13,13 @@ A full example is avaiable on [here](https://stackblitz.com/edit/react-ts-qi1zgm
 With npm:
 
 ```
-npm install @mr96/useTimeline
+npm install @mr96/use-timeline
 ```
 
 With yarn:
 
 ```
-yarn add @mr96/useTimeline
+yarn add @mr96/use-timeline
 ```
 
 ## Quick Start
