@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { isFunction } from "./utils";
 
 /**
@@ -149,7 +149,7 @@ export function useTimeline<T>(initialValue?: T, options?: Options): TimelineIns
     ...options
   } as Required<Options>;
 
-  const setState = useCallback((arg: SetStateArg<T>) => {
+  const setState = (arg: SetStateArg<T>) => {
     _setState((s) => {
       const timeSlice = _getCurrentTimeSlice(s);
 
@@ -158,35 +158,35 @@ export function useTimeline<T>(initialValue?: T, options?: Options): TimelineIns
       }
       return _insert(s, arg, maxTimelineSize);
     });
-  }, []);
+  }
 
-  const undo = useCallback(() => {
+  const undo = () => {
     _setState((s) => {
       const { index } = s;
 
       return _undoTo(s, index - 1);
     });
-  }, []);
+  }
 
-  const redo = useCallback(() => {
+  const redo = () => {
     _setState((s) => {
       const { index } = s;
 
       return _redoTo(s, index + 1);
     });
-  }, []);
+  }
 
-  const jumpTo = useCallback((index: number) => {
+  const jumpTo = (index: number) => {
     _setState((s) => {
       return _jumpTo(s, index);
     });
-  }, []);
+  }
 
-  const clearTimeline = useCallback(() => {
+  const clearTimeline = () => {
     _setState((s) => {
       return _clearTimeline(s)
     })
-  }, []);
+  }
 
   const pastTimeline = useMemo(() => _getPast(_state), [_state]);
   const futureTimeline = useMemo(() => _getFuture(_state), [_state]);
